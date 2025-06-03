@@ -1,12 +1,9 @@
 const themeToggle = document.getElementById('themeToggle');
 const urlForm = document.getElementById('urlForm');
 const urlInput = document.getElementById('urlInput');
-const lengthSlider = document.getElementById('lengthSlider');
-const randomToggle = document.getElementById('randomToggle');
 const customUrlToggle = document.getElementById('customUrlToggle');
 const customUrlInput = document.getElementById('customUrlInput');
 const customUrlContainer = document.getElementById('customUrlContainer');
-const lengthDisplay = document.getElementById('lengthDisplay');
 const result = document.getElementById('result');
 const error = document.getElementById('error');
 
@@ -32,28 +29,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 
 customUrlToggle.addEventListener('change', () => {
     customUrlContainer.classList.toggle('active', customUrlToggle.checked);
-    lengthSlider.parentElement.classList.toggle('disabled', customUrlToggle.checked);
-    randomToggle.parentElement.classList.toggle('disabled', customUrlToggle.checked);
-    updateLengthDisplay();
 });
-
-function updateLengthDisplay() {
-    if (customUrlToggle.checked) {
-        lengthDisplay.textContent = 'Using custom URL';
-    } else if (randomToggle.checked) {
-        lengthDisplay.textContent = 'Your short link will have a random length between 1-6 characters';
-        lengthSlider.parentElement.classList.add('disabled');
-    } else {
-        const length = lengthSlider.value;
-        lengthDisplay.textContent = `Your short link will be ${length} character${length !== '1' ? 's' : ''} long`;
-        lengthSlider.parentElement.classList.remove('disabled');
-    }
-}
-
-lengthSlider.addEventListener('input', updateLengthDisplay);
-randomToggle.addEventListener('change', updateLengthDisplay);
-
-updateLengthDisplay();
 
 function isValidUrl(string) {
     try {
@@ -81,9 +57,7 @@ urlForm.addEventListener('submit', async (e) => {
         }
 
         const requestBody = {
-            url: urlToCheck,
-            length: parseInt(lengthSlider.value),
-            isRandom: randomToggle.checked,
+            url: urlToCheck
         };
 
         if (customUrlToggle.checked) {
@@ -96,8 +70,6 @@ urlForm.addEventListener('submit', async (e) => {
             }
 
             requestBody.customCode = customUrlInput.value.trim();
-            delete requestBody.length;
-            delete requestBody.isRandom;
         }
 
         const response = await fetch('/api/shorten', {

@@ -10,8 +10,6 @@ export function apiRoutes(context) {
     router.post('/shorten', (req, res) => {
         const {
             url,
-            length,
-            isRandom,
             customCode
         } = req.body;
 
@@ -46,43 +44,20 @@ export function apiRoutes(context) {
 
                 shortCode = customCode;
             } else {
-                if (isRandom) {
-                    const existingCode = urlStorage.getShortCodeForUrl(url);
-                    if (existingCode) {
-                        return res.json({
-                            shortCode: existingCode,
-                            shortUrl: `https://${req.get('host')}/${existingCode}`,
-                            originalUrl: url,
-                            isExisting: true
-                        });
-                    }
-                } else {
-                    const existingCode = urlStorage.getShortCode(url, length);
-                    if (existingCode) {
-                        return res.json({
-                            shortCode: existingCode,
-                            shortUrl: `https://${req.get('host')}/${existingCode}`,
-                            originalUrl: url,
-                            isExisting: true
-                        });
-                    }
-                }
-
-                const parsedLength = parseInt(length, 10);
-                if (isNaN(parsedLength) || parsedLength < 1 || parsedLength > 6) {
-                    return res.status(400).json({
-                        error: 'Length must be between 1 and 6'
+                const existingCode = urlStorage.getShortCodeForUrl(url);
+                if (existingCode) {
+                    return res.json({
+                        shortCode: existingCode,
+                        shortUrl: `https://${req.get('host')}/${existingCode}`,
+                        originalUrl: url,
+                        isExisting: true
                     });
                 }
 
-                shortCode = createShortUrl(
-                    parsedLength,
-                    isRandom === true,
-                    code => urlStorage.shortCodeExists(code)
-                );
+                shortCode = createShortUrl(code => urlStorage.shortCodeExists(code));
             }
 
-            const stored = urlStorage.storeUrl(shortCode, url, customCode ? customCode.length : length);
+            const stored = urlStorage.storeUrl(shortCode, url, shortCode.length);
             if (!stored) {
                 return res.status(500).json({
                     error: 'Failed to store URL'

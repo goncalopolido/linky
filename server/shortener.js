@@ -11,22 +11,19 @@ function generateRandomString(length) {
     return result;
 }
 
-export function createShortUrl(length, isRandom, existsCheck) {
-
-    const finalLength = isRandom ? Math.floor(Math.random() * 6) + 1 : length;
-
-    let shortCode = generateRandomString(finalLength);
-
+export function createShortUrl(existsCheck) {
+    let length = 5;
+    let shortCode = generateRandomString(length);
     let attempts = 0;
     const maxAttempts = 10;
 
-    while (existsCheck(shortCode) && attempts < maxAttempts) {
-        shortCode = generateRandomString(finalLength);
+    while (existsCheck(shortCode)) {
+        if (attempts >= maxAttempts) {
+            length++;
+            attempts = 0;
+        }
+        shortCode = generateRandomString(length);
         attempts++;
-    }
-
-    if (attempts >= maxAttempts) {
-        return createShortUrl(Math.min(finalLength + 1, 6), false, existsCheck);
     }
 
     return shortCode;

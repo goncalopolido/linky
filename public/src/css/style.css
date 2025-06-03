@@ -35,8 +35,7 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.5;
   min-height: 100vh;
   color: var(--text);
@@ -77,8 +76,7 @@ body {
   background-color: rgba(128, 128, 128, 0.1);
 }
 
-.github-icon,
-.theme-icon {
+.github-icon, .theme-icon {
   width: 24px;
   height: 24px;
   display: block;
