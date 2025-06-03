@@ -21,9 +21,24 @@ export function apiRoutes(context) {
 
         try {
             const urlObj = new URL(url);
+
             if (!['http:', 'https:'].includes(urlObj.protocol)) {
                 return res.status(400).json({
                     error: 'URL must use HTTP or HTTPS protocol'
+                });
+            }
+
+            const hostnameParts = urlObj.hostname.split('.');
+            if (hostnameParts.length < 2) {
+                return res.status(400).json({
+                    error: 'Invalid domain name'
+                });
+            }
+
+            const tld = hostnameParts[hostnameParts.length - 1];
+            if (tld.length < 2) {
+                return res.status(400).json({
+                    error: 'Invalid top-level domain'
                 });
             }
 

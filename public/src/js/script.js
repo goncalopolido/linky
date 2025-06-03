@@ -34,7 +34,21 @@ customUrlToggle.addEventListener('change', () => {
 function isValidUrl(string) {
     try {
         const url = new URL(string);
-        return url.protocol === 'http:' || url.protocol === 'https:';
+
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+            return false;
+        }
+
+        const parts = url.hostname.split('.');
+        if (parts.length < 2) {
+            return false;
+        }
+
+        const tld = parts[parts.length - 1];
+        if (tld.length < 2) {
+            return false;
+        }
+        return true;
     } catch (_) {
         return false;
     }
@@ -53,7 +67,7 @@ urlForm.addEventListener('submit', async (e) => {
         const urlToCheck = urlInput.value.trim();
 
         if (!isValidUrl(urlToCheck)) {
-            throw new Error('Please enter a valid URL (must start with http:// or https://)');
+            throw new Error('Please enter a valid URL (must include http:// or https:// and a valid domain)');
         }
 
         const requestBody = {
