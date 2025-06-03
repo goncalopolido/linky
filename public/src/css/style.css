@@ -44,7 +44,7 @@ body {
   display: flex;
   flex-direction: column;
   transition: color 0.3s, background-color 0.3s;
-  text-transform: lowercase;
+  text-transform: none;
 }
 
 .header-title {
