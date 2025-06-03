@@ -2,7 +2,7 @@
 
 A minimalist URL shortening app.
 
-![image (1)](https://github.com/user-attachments/assets/0d72e71b-e741-4ae9-83fa-28c2505d21db)
+![image](https://github.com/user-attachments/assets/199bdcab-65c7-47b8-8f71-f71ca7ccf769)
 
 ## Features
 
