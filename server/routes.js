@@ -1,0 +1,106 @@
+import express from 'express';
+
+export function apiRoutes(context) {
+    const {
+        urlStorage,
+        createShortUrl
+    } = context;
+    const router = express.Router();
+
+    router.post('/shorten', (req, res) => {
+        const {
+            url,
+            length,
+            isRandom,
+            customCode
+        } = req.body;
+
+        if (!url || typeof url !== 'string') {
+            return res.status(400).json({
+                error: 'Invalid URL'
+            });
+        }
+
+        try {
+            const urlObj = new URL(url);
+            if (!['http:', 'https:'].includes(urlObj.protocol)) {
+                return res.status(400).json({
+                    error: 'URL must use HTTP or HTTPS protocol'
+                });
+            }
+
+            let shortCode;
+
+            if (customCode) {
+                if (!/^[a-zA-Z0-9-_]+$/.test(customCode)) {
+                    return res.status(400).json({
+                        error: 'Custom URL can only contain letters, numbers, hyphens, and underscores'
+                    });
+                }
+
+                if (urlStorage.shortCodeExists(customCode)) {
+                    return res.status(400).json({
+                        error: 'This custom URL is already taken'
+                    });
+                }
+
+                shortCode = customCode;
+            } else {
+                if (isRandom) {
+                    const existingCode = urlStorage.getShortCodeForUrl(url);
+                    if (existingCode) {
+                        return res.json({
+                            shortCode: existingCode,
+                            shortUrl: `https://${req.get('host')}/${existingCode}`,
+                            originalUrl: url,
+                            isExisting: true
+                        });
+                    }
+                } else {
+                    const existingCode = urlStorage.getShortCode(url, length);
+                    if (existingCode) {
+                        return res.json({
+                            shortCode: existingCode,
+                            shortUrl: `https://${req.get('host')}/${existingCode}`,
+                            originalUrl: url,
+                            isExisting: true
+                        });
+                    }
+                }
+
+                const parsedLength = parseInt(length, 10);
+                if (isNaN(parsedLength) || parsedLength < 1 || parsedLength > 6) {
+                    return res.status(400).json({
+                        error: 'Length must be between 1 and 6'
+                    });
+                }
+
+                shortCode = createShortUrl(
+                    parsedLength,
+                    isRandom === true,
+                    code => urlStorage.shortCodeExists(code)
+                );
+            }
+
+            const stored = urlStorage.storeUrl(shortCode, url, customCode ? customCode.length : length);
+            if (!stored) {
+                return res.status(500).json({
+                    error: 'Failed to store URL'
+                });
+            }
+
+            return res.json({
+                shortCode,
+                shortUrl: `https://${req.get('host')}/${shortCode}`,
+                originalUrl: url,
+                isExisting: false
+            });
+        } catch (error) {
+            return res.status(400).json({
+                error: 'Invalid URL format'
+            });
+        }
+    });
+
+    return router;
+}

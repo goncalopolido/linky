@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="src/svg/dark-url.svg" type="image/svg+xml" media="(prefers-color-scheme: light)">
+    <link rel="icon" href="src/svg/light-url.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Linky</title>
+    <meta name="description" content="A minimalist URL shortening app.">
+    <meta name="theme-color" content="#000000">
+    <link rel="stylesheet" href="src/css/style.css">
+  </head>
+  <body>
+    <header>
+      <a href="/" class="header-title">
+        <h1>Linky</h1>
+      </a>
+      <div class="header-buttons">
+        <a href="https://github.com/goncalopolido/linky" target="_blank" rel="noopener noreferrer" class="github-link" aria-label="View source on GitHub">
+          <img src="src/svg/dark-github.svg" alt="GitHub" class="github-icon" data-theme="light">
+          <img src="src/svg/light-github.svg" alt="GitHub" class="github-icon" data-theme="dark">
+        </a>
+        <button id="themeToggle" aria-label="Toggle theme">
+          <img src="src/svg/dark-moon.svg" alt="Switch to dark mode" class="theme-icon" data-theme="light">
+          <img src="src/svg/light-sun.svg" alt="Switch to light mode" class="theme-icon" data-theme="dark">
+        </button>
+      </div>
+    </header>
+    <main>
+      <form id="urlForm">
+        <div class="input-group">
+          <label for="urlInput">paste url</label>
+          <input id="urlInput" type="text" placeholder="paste url, shorten & share" required />
+        </div>
+        <div class="custom-url-toggle">
+          <input type="checkbox" id="customUrlToggle" />
+          <label for="customUrlToggle">use custom url</label>
+        </div>
+        <div id="customUrlContainer" class="custom-url-input">
+          <div class="input-group">
+            <label for="customUrlInput">custom url</label>
+            <input id="customUrlInput" type="text" placeholder="enter your custom url" />
+          </div>
+        </div>
+        <div class="length-selector">
+          <div class="length-header">
+            <label>shortened link length</label>
+            <div class="random-toggle">
+              <input type="checkbox" id="randomToggle" />
+              <label for="randomToggle">random</label>
+            </div>
+          </div>
+          <div class="range-container">
+            <div class="range-labels">
+              <span>1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5</span>
+              <span>6</span>
+            </div>
+            <input type="range" id="lengthSlider" min="1" max="6" value="3" />
+          </div>
+          <p id="lengthDisplay" class="length-display"> your short link will be 3 characters long </p>
+        </div>
+        <button type="submit">shorten url</button>
+      </form>
+      <div id="result" class="result hidden"></div>
+      <div id="error" class="error hidden"></div>
+    </main>
+    <script src="src/js/script.js"></script>
+  </body>
+</html>
