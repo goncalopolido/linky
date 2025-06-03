@@ -7,8 +7,6 @@ A minimalist URL shortening app.
 ## Features
 
 - Custom URL support: Create memorable short links
-- Adjustable link length: Choose between 1-6 characters
-- Random length option: Let the system decide
 - Duplicate prevention: Same URLs get the same short code
 - Auto dark/light theme based on system settings
 - Fully responsive design for all devices
