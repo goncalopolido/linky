@@ -8,99 +8,99 @@ const result = document.getElementById('result');
 const error = document.getElementById('error');
 
 function getSystemTheme() {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.setAttribute('data-theme', theme);
 }
 
 setTheme(getSystemTheme());
 
 themeToggle.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || getSystemTheme();
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
+  const currentTheme = document.documentElement.getAttribute('data-theme') || getSystemTheme();
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  setTheme(newTheme);
 });
 
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    setTheme(getSystemTheme());
+  setTheme(getSystemTheme());
 });
 
 customUrlToggle.addEventListener('change', () => {
-    customUrlContainer.classList.toggle('active', customUrlToggle.checked);
+  customUrlContainer.classList.toggle('active', customUrlToggle.checked);
 });
 
 function isValidUrl(string) {
-    try {
-        const url = new URL(string);
+  if (!string.match(/^https?:\/\//i)) {
+    string = 'https://' + string;
+  }
 
-        if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-            return false;
-        }
-
-        const parts = url.hostname.split('.');
-        if (parts.length < 2) {
-            return false;
-        }
-
-        const tld = parts[parts.length - 1];
-        if (tld.length < 2) {
-            return false;
-        }
-        return true;
-    } catch (_) {
-        return false;
+  try {
+    const url = new URL(string);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return false;
     }
+    const parts = url.hostname.split('.');
+    if (parts.length < 2) {
+      return false;
+    }
+    const tld = parts[parts.length - 1];
+    if (tld.length < 2) {
+      return false;
+    }
+    return { isValid: true, url: string };
+  } catch (_) {
+    return { isValid: false, url: string };
+  }
 }
 
 urlForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    error.classList.add('hidden');
-    result.classList.add('hidden');
+  e.preventDefault();
+  error.classList.add('hidden');
+  result.classList.add('hidden');
+  
+  const submitButton = e.target.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = 'Shortening...';
 
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Shortening...';
+  try {
+    const urlToCheck = urlInput.value.trim();
+    const validationResult = isValidUrl(urlToCheck);
+    
+    if (!validationResult.isValid) {
+      throw new Error('Please enter a valid URL (e.g., https://example.com, http://example.com or example.com');
+    }
 
-    try {
-        const urlToCheck = urlInput.value.trim();
+    const requestBody = {
+      url: validationResult.url
+    };
 
-        if (!isValidUrl(urlToCheck)) {
-            throw new Error('Please enter a valid URL (must include http:// or https:// and a valid domain)');
-        }
+    if (customUrlToggle.checked) {
+      if (!customUrlInput.value.trim()) {
+        throw new Error('Please enter a custom URL');
+      }
+      
+      if (!/^[a-zA-Z0-9-_]+$/.test(customUrlInput.value.trim())) {
+        throw new Error('Custom URL can only contain letters, numbers, hyphens, and underscores');
+      }
+      
+      requestBody.customCode = customUrlInput.value.trim();
+    }
 
-        const requestBody = {
-            url: urlToCheck
-        };
-
-        if (customUrlToggle.checked) {
-            if (!customUrlInput.value.trim()) {
-                throw new Error('Please enter a custom URL');
-            }
-
-            if (!/^[a-zA-Z0-9-_]+$/.test(customUrlInput.value.trim())) {
-                throw new Error('Custom URL can only contain letters, numbers, hyphens, and underscores');
-            }
-
-            requestBody.customCode = customUrlInput.value.trim();
-        }
-
-        const response = await fetch('/api/shorten', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || 'Failed to shorten URL');
-        }
-
-        result.innerHTML = `
+    const response = await fetch('/api/shorten', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(requestBody),
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to shorten URL');
+    }
+    
+    result.innerHTML = `
       <div class="short-url-container">
         <a href="${data.shortUrl}" target="_blank" rel="noopener noreferrer">${data.shortUrl}</a>
         <button id="copyButton" aria-label="Copy to clipboard">
@@ -115,32 +115,32 @@ urlForm.addEventListener('submit', async (e) => {
       </div>
     `;
 
-        const copyButton = document.getElementById('copyButton');
-        const copyIcon = document.getElementById('copyIcon');
-        const checkIcon = document.getElementById('checkIcon');
+    const copyButton = document.getElementById('copyButton');
+    const copyIcon = document.getElementById('copyIcon');
+    const checkIcon = document.getElementById('checkIcon');
 
-        copyButton.addEventListener('click', async () => {
-            try {
-                await navigator.clipboard.writeText(data.shortUrl);
-                copyIcon.classList.add('hidden');
-                checkIcon.classList.remove('hidden');
-                setTimeout(() => {
-                    copyIcon.classList.remove('hidden');
-                    checkIcon.classList.add('hidden');
-                }, 2000);
-            } catch (err) {
-                console.error('Failed to copy:', err);
-            }
-        });
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(data.shortUrl);
+        copyIcon.classList.add('hidden');
+        checkIcon.classList.remove('hidden');
+        setTimeout(() => {
+          copyIcon.classList.remove('hidden');
+          checkIcon.classList.add('hidden');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
 
-        result.classList.remove('hidden');
-        error.classList.add('hidden');
-    } catch (err) {
-        result.classList.add('hidden');
-        error.classList.remove('hidden');
-        error.textContent = err.message;
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Shorten URL';
-    }
+    result.classList.remove('hidden');
+    error.classList.add('hidden');
+  } catch (err) {
+    result.classList.add('hidden');
+    error.classList.remove('hidden');
+    error.textContent = err.message;
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = 'Shorten URL';
+  }
 });
