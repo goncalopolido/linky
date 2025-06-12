@@ -8,7 +8,6 @@ const __dirname = dirname(__filename);
 
 export class UrlStorage {
   constructor() {
-    // Create the database directory in the project root
     const dbDir = join(process.cwd(), 'database');
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
