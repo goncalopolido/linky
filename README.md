@@ -32,7 +32,7 @@ npm start
 > [!NOTE]
 > Due to a high volume of abuse emails, all shortened URLs created in the live demo expire after 10 minutes.
 
-Try Linky at [linky.polido.pt](https://linky.polido.pt).
+Try Linky at [linky.polido.pt](https://linky.vercel.app).
 
 ## Technical Details
 
